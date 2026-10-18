@@ -70,6 +70,12 @@ jobs:
           pattern: jt-desktop-*
           path: release-assets
           merge-multiple: true
+      - name: Generate SHA-256 checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd release-assets
+          sha256sum JT-* > SHA256SUMS.txt
       - name: List release assets
         run: ls -lah release-assets
       - name: Publish stable release
