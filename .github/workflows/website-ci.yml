@@ -87,7 +87,8 @@ jobs:
           test -f dist/jt-ai-agent/workspace.js
           test -f dist/jt-ai-agent/downloads.html
           test -f dist/jt-ai-hub/index.html
-          grep -q "Compare ChatGPT + Jeff AI" dist/jt-ai-hub/index.html
+          grep -q "Compare GPT Luna + Jeff AI" dist/jt-ai-hub/index.html
+grep -q "Gemini 2.5 Flash" dist/jt-ai-hub/index.html
           grep -q "Open Microsoft Copilot" dist/jt-ai-hub/index.html
           grep -q 'providerSelect' dist/jt-ai-agent/index.html
           grep -q 'provider:providerSelect.value' dist/jt-ai-agent/workspace.js
