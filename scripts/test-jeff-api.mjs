@@ -25,6 +25,17 @@ assert.equal(response.status, 400);
 response = await invoke({ message: "hello", provider: "copilot-cli" });
 assert.equal(response.status, 501);
 
+response = await onRequestPost({
+  request: new Request("https://jt.example/api/jeff", {
+    method: "POST",
+    headers: { "content-type": "application/json", origin: "https://jt.example" },
+    body: JSON.stringify({ message: "hello", padding: "x".repeat(33000) })
+  }),
+  env: {}
+});
+assert.equal(response.status, 413);
+assert.equal((await response.json()).error, "request_too_large");
+
 response = await invoke({ message: "hello", provider: "openai" });
 assert.equal(response.status, 503);
 assert.equal((await response.json()).error, "service_disabled");
