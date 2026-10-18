@@ -10,6 +10,7 @@ on:
       - "assets/**"
       - "jt-ai-agent/**"
       - "jt-apps/**"
+      - "products/**"
       - "scripts/build-site.mjs"
       - "package.json"
       - "wrangler.toml"
@@ -49,6 +50,7 @@ jobs:
           node --check jt-apps/jt-stream/studio.js
           node --check jt-apps/workspace-tools.js
           node --check jt-apps/pro-workspaces.js
+          node --check products/site.js
           grep -q "AI coding-agent handoff" jt-apps/pro-workspaces.js
           grep -q "Cloud provider connectors" jt-apps/pro-workspaces.js
           grep -q "Provider and agent compatibility" jt-apps/pro-workspaces.js
@@ -73,6 +75,16 @@ jobs:
           test -f dist/jt-apps/jt-stream/studio.js
           test -f dist/jt-apps/workspace-tools.js
           test -f dist/jt-apps/pro-workspaces.js
+          test -f dist/products/site.css
+          test -f dist/products/site.js
+          for app in jt-code jt-design jt-cloud jt-app-manager jt-ai-core agent-jeff jt-stream; do
+            test -f "dist/products/$app/index.html"
+            test -f "dist/products/$app/downloads.html"
+            grep -q "downloads.html" "dist/products/$app/index.html"
+          done
+          grep -q '/jt-apps/jt-studio/' dist/jt-apps/index.html
+          grep -q '/jt-apps/jt-motion/' dist/jt-apps/index.html
+          grep -q '/products/jt-code/' dist/jt-apps/index.html
           for app in jt-ai-core jt-app-manager jt-cloud jt-code jt-design jt-motion jt-studio agent-jeff jt-stream; do
             grep -q 'pro-workspaces.js' "dist/jt-apps/$app/index.html"
           done
