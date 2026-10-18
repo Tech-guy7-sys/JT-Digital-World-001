@@ -1,0 +1,47 @@
+{
+  "name": "jt-ai-hub-desktop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Dedicated Windows desktop shell for the JT AI Hub web workspace",
+  "main": "main.cjs",
+  "author": "J Tech Digital World",
+  "license": "UNLICENSED",
+  "scripts": {
+    "package:win": "electron-builder --win nsis"
+  },
+  "devDependencies": {
+    "electron": "37.2.6",
+    "electron-builder": "26.0.12"
+  },
+  "build": {
+    "appId": "world.jtechdigital.jt-ai-hub",
+    "productName": "JT AI Hub",
+    "asar": true,
+    "files": [
+      "main.cjs",
+      "package.json"
+    ],
+    "directories": {
+      "output": "../desktop-ai-hub-artifacts",
+      "buildResources": "build"
+    },
+    "artifactName": "JT-AI-Hub-${version}-${arch}.${ext}",
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "artifactName": "JT-AI-Hub-Setup-${version}-x64.${ext}",
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  }
+}
