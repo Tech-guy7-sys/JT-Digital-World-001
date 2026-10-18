@@ -94,6 +94,46 @@ async function providerRequest(provider, messages, env) {
   }
 }
 
+let cachedAccessKeys = null;
+let cachedAccessKeysAt = 0;
+
+function decodeBase64Url(value) {
+  const normalized = value.replace(/-/g, "+").replace(/_/g, "/");
+  return Uint8Array.from(atob(normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=")), char => char.charCodeAt(0));
+}
+
+async function verifyCloudflareAccess(request, env) {
+  const teamDomain = envValue(env, "JEFF_ACCESS_TEAM_DOMAIN").replace(/^https?:\/\//, "").replace(/\/$/, "");
+  const audience = envValue(env, "JEFF_ACCESS_AUD");
+  const token = request.headers.get("cf-access-jwt-assertion") || "";
+  if (!teamDomain || !audience || !token) return false;
+  try {
+    const parts = token.split(".");
+    if (parts.length !== 3) return false;
+    const header = JSON.parse(new TextDecoder().decode(decodeBase64Url(parts[0])));
+    const claims = JSON.parse(new TextDecoder().decode(decodeBase64Url(parts[1])));
+    const now = Math.floor(Date.now() / 1000);
+    const issuer = "https://" + teamDomain;
+    if (header.alg !== "RS256" || !header.kid || claims.iss !== issuer || !Number.isFinite(claims.exp) || claims.exp <= now || (claims.nbf && claims.nbf > now)) return false;
+    const audiences = Array.isArray(claims.aud) ? claims.aud : [claims.aud];
+    if (!audiences.includes(audience)) return false;
+    if (!cachedAccessKeys || Date.now() - cachedAccessKeysAt > 600000) {
+      const response = await fetch(issuer + "/cdn-cgi/access/certs", { headers: { accept: "application/json" } });
+      if (!response.ok) return false;
+      const data = await response.json();
+      if (!Array.isArray(data.keys)) return false;
+      cachedAccessKeys = data.keys;
+      cachedAccessKeysAt = Date.now();
+    }
+    const jwk = cachedAccessKeys.find(key => key.kid === header.kid && key.kty === "RSA");
+    if (!jwk) return false;
+    const key = await crypto.subtle.importKey("jwk", jwk, { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" }, false, ["verify"]);
+    return await crypto.subtle.verify("RSASSA-PKCS1-v1_5", key, decodeBase64Url(parts[2]), new TextEncoder().encode(parts[0] + "." + parts[1]));
+  } catch {
+    return false;
+  }
+}
+
 async function readBoundedJson(request, maxBytes) {
   if (!request.body) return { ok: true, text: "" };
   const reader = request.body.getReader();
@@ -157,6 +197,15 @@ export async function onRequestPost({ request, env }) {
   if (provider === "copilot-cli") return json({ error: "native_bridge_required", message: "Copilot CLI requires the Agent Jeff native bridge; it cannot run inside a hosted Pages function." }, 501);
 
   if (envValue(env || {}, "JEFF_API_ENABLED", "false").toLowerCase() !== "true") return json({ error: "service_disabled", message: "Jeff AI API is disabled until deployment security and provider configuration are completed." }, 503);
+  if (!envValue(env || {}, "JEFF_ACCESS_TEAM_DOMAIN") || !envValue(env || {}, "JEFF_ACCESS_AUD") || !env?.JEFF_RATE_LIMITER || typeof env.JEFF_RATE_LIMITER.limit !== "function") return json({ error: "security_not_configured", message: "AI requests are disabled until Cloudflare Access and the rate-limit binding are configured." }, 503);
+  if (!(await verifyCloudflareAccess(request, env || {}))) return json({ error: "authentication_required", message: "Sign in through the approved JT access page before using AI services." }, 401);
+  const ip = request.headers.get("cf-connecting-ip") || "unknown";
+  try {
+    const result = await env.JEFF_RATE_LIMITER.limit({ key: ip });
+    if (!result?.success) return json({ error: "rate_limited", message: "Too many AI requests. Wait a little and try again." }, 429);
+  } catch {
+    return json({ error: "rate_limiter_unavailable", message: "AI requests are temporarily disabled because rate limiting is unavailable." }, 503);
+  }
 
   const messages = safeMessages(payload.history, message);
   return providerRequest(provider, messages, env || {});
