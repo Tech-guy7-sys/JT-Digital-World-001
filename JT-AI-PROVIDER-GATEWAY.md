@@ -1,26 +1,33 @@
 # JT AI provider gateway (Cloudflare Pages Functions)
 
-This adds a real same-origin `POST /api/jeff` handler. It is a provider gateway, not an authentication system and not a guarantee that any provider has been configured.
+The `POST /api/jeff` endpoint is a server-side provider gateway. It remains disabled unless explicitly enabled and all security gates pass.
 
-## Supported server-side adapters
-- **Ollama**: `OLLAMA_BASE_URL`, optional `OLLAMA_MODEL` (default `deepseek-r1:1.5b`). A Cloudflare-hosted function cannot reach your PC's `127.0.0.1`. Use a secured, reachable gateway. Do not expose an unauthenticated Ollama port to the public internet.
-- **OpenAI**: secret `OPENAI_API_KEY`; optional `OPENAI_BASE_URL` (defaults to OpenAI's API base) and `OPENAI_MODEL` (defaults to `gpt-4o-mini`).
-- **Anthropic Claude**: secret `ANTHROPIC_API_KEY`; optional `ANTHROPIC_MODEL` (defaults to `claude-3-5-haiku-latest`).
-- **Google Gemini**: secret `GEMINI_API_KEY`; optional `GEMINI_MODEL` (defaults to `gemini-3.8-flash`).
-- **Copilot CLI**: deliberately returns a clear native-bridge-required response; a hosted Pages function cannot launch a CLI on the user's Windows machine.
+## Supported provider adapters
+- **OpenAI**: secret `OPENAI_API_KEY`; optional `OPENAI_BASE_URL` and `OPENAI_MODEL`.
+- **Ollama / Jeff AI**: `OLLAMA_BASE_URL` and optional `OLLAMA_MODEL`. Cloudflare cannot reach a user's PC localhost; use a secured, reachable gateway. Never expose an unauthenticated Ollama port.
+- **Anthropic**: secret `ANTHROPIC_API_KEY`; optional `ANTHROPIC_MODEL`.
+- **Gemini**: secret `GEMINI_API_KEY`; optional `GEMINI_MODEL`.
+- The free Microsoft Copilot consumer app does not expose a documented general-purpose chat API for this integration. The UI uses manual handoff instead.
 
-## Deploy requirements
-1. Keep `JEFF_API_ENABLED` unset or set to `false` during initial deployment. The endpoint deliberately returns HTTP 503 until you explicitly enable it.
-2. The repository includes a GitHub Actions deployment workflow at `.github/workflows/deploy-cloudflare-pages.yml`. Add repository Actions secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`; the workflow creates and deploys the replacement project `jt-digital-world-new`. It builds with `npm run build:website` and publishes `dist`, while keeping Pages Functions in the root `functions/` directory.
-3. In Cloudflare Pages → project → Settings → Variables and Secrets, first add the secrets for providers you intend to use. Set model names as non-secret environment variables if desired. Never commit API keys to Git.
-4. Add `JEFF_API_ENABLED=true` only after you have reviewed the security limits below and configured a provider. Redeploy after configuring the environment.
-5. Test with a short chat for every configured provider. The browser UI persists the selected preference and sends it to the API.
+## Required security setup before enabling
+1. Keep `JEFF_API_ENABLED=false` or unset until all steps below are complete.
+2. Protect the deployed JT AI Hub/API with a Cloudflare Access application and an allow policy limited to approved users. Configure the app so requests to `/api/jeff` receive the `Cf-Access-Jwt-Assertion` header.
+3. In Pages Functions environment variables, set `JEFF_ACCESS_TEAM_DOMAIN` to the Access team domain hostname (for example, `team-name.cloudflareaccess.com`, without a scheme) and `JEFF_ACCESS_AUD` to the exact application AUD value shown by Cloudflare Access. Do not guess the AUD.
+4. Create a Cloudflare Workers rate-limit binding named `JEFF_RATE_LIMITER` for the Pages Function. Use a conservative per-IP threshold appropriate to the expected traffic. If this binding is absent or unavailable, the endpoint deliberately returns 503. Confirm the exact binding configuration supported by the project's Cloudflare Pages deployment method before enabling.
+5. Add only the provider secrets you intend to use in Cloudflare Pages → Settings → Variables and Secrets. Never commit secrets or put them in browser JavaScript.
+6. Only after the Access policy, JWT settings, rate limiter, provider secrets, and monitoring are verified should you set `JEFF_API_ENABLED=true`.
+7. Test an unauthenticated request (must return 401), a burst of requests (must return 429 when the limit is reached), a request without the rate-limit binding (must return 503), and one short request for each configured provider.
 
-## Security and current limits
-- Same-origin check, JSON-only request validation, input/history bounds, no-store responses, provider request timeout, and generic upstream errors are implemented.
-- The endpoint does **not** implement account authentication, quotas, persistent cross-user rate limiting, billing controls, or abuse monitoring. Before public launch, put it behind an authenticated account/session and a durable rate limiter. Do not advertise it as production-safe for unrestricted anonymous use.
-- Provider names are allow-listed. Provider credentials are read only from server environment bindings and never from browser input.
-- Responses are non-streaming JSON to match the current JT AI Agent UI.
+## Implemented protections
+- Same-origin and JSON content-type checks.
+- Request-body limit of 32 KB, message limit of 6,000 characters, and bounded chat history.
+- Cloudflare Access JWT signature validation against the team's published RSA keys, including issuer, audience, expiry, and not-before checks.
+- Required rate-limit binding. Missing configuration or limiter failure is fail-closed.
+- Provider allow-list, server-only credentials, provider timeout, generic upstream errors, and no-store JSON responses.
 
-## Local testing
-Use Cloudflare Pages' local development tooling after installing dependencies in a development environment. The website CI performs static checks and the deployment workflow uses Wrangler. A successful website deployment does not prove live Gemini connectivity; configure `GEMINI_API_KEY` as a Cloudflare Pages secret and test the provider before enabling the API.
+## Limitations
+- A website deployment does not prove that any AI provider is configured or reachable.
+- API usage is billed separately by the respective provider.
+- A hosted Pages Function cannot run a Windows CLI or connect to a user's local Ollama instance.
+- A Cloudflare Access login is not a substitute for provider quotas, budget alerts, monitoring, and incident response. Keep the service disabled until these are in place.
+- The website CI runs validation tests; it does not validate live provider credentials.
