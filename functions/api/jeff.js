@@ -53,7 +53,7 @@ async function providerRequest(provider, messages, env) {
       if (!key) return json({ error: "provider_not_configured", message: "The OpenAI provider is not configured on the server." }, 503);
       url = envValue(env, "OPENAI_BASE_URL", "https://api.openai.com/v1").replace(/\/$/, "") + "/chat/completions";
       headers.authorization = "Bearer " + key;
-      body = JSON.stringify({ model: envValue(env, "OPENAI_MODEL", "gpt-4o-mini"), messages: [{ role: "system", content: systemPrompt }, ...messages], stream: false });
+      body = JSON.stringify({ model: envValue(env, "OPENAI_MODEL", "gpt-6-luna"), messages: [{ role: "system", content: systemPrompt }, ...messages], stream: false });
     } else if (provider === "anthropic") {
       const key = envValue(env, "ANTHROPIC_API_KEY");
       if (!key) return json({ error: "provider_not_configured", message: "The Claude provider is not configured on the server." }, 503);
@@ -64,7 +64,7 @@ async function providerRequest(provider, messages, env) {
     } else if (provider === "gemini") {
       const key = envValue(env, "GEMINI_API_KEY");
       if (!key) return json({ error: "provider_not_configured", message: "The Gemini provider is not configured on the server." }, 503);
-      const model = envValue(env, "GEMINI_MODEL", "gemini-3.8-flash");
+      const model = envValue(env, "GEMINI_MODEL", "gemini-2.5-flash");
       url = "https://generativelanguage.googleapis.com/v1beta/models/" + encodeURIComponent(model) + ":generateContent";
       headers["x-goog-api-key"] = key;
       body = JSON.stringify({ systemInstruction: { parts: [{ text: systemPrompt }] }, contents: messages.map(item => ({ role: item.role === "assistant" ? "model" : "user", parts: [{ text: item.content }] })), generationConfig: { maxOutputTokens: 1400, temperature: 0.7 } });
@@ -88,7 +88,7 @@ async function providerRequest(provider, messages, env) {
     }
     const reply = extractText(provider, data);
     if (!reply) return json({ error: "empty_provider_response", message: "The AI provider returned no text. Try again or choose another configured model." }, 502);
-    return json({ reply, provider, model: provider === "ollama" ? envValue(env, "OLLAMA_MODEL", "deepseek-r1:1.5b") : provider === "openai" ? envValue(env, "OPENAI_MODEL", "gpt-4o-mini") : provider === "anthropic" ? envValue(env, "ANTHROPIC_MODEL", "claude-3-5-haiku-latest") : envValue(env, "GEMINI_MODEL", "gemini-3.8-flash") });
+    return json({ reply, provider, model: provider === "ollama" ? envValue(env, "OLLAMA_MODEL", "deepseek-r1:1.5b") : provider === "openai" ? envValue(env, "OPENAI_MODEL", "gpt-6-luna") : provider === "anthropic" ? envValue(env, "ANTHROPIC_MODEL", "claude-3-5-haiku-latest") : envValue(env, "GEMINI_MODEL", "gemini-2.5-flash") });
   } finally {
     clearTimeout(timeout);
   }
