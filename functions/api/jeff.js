@@ -94,6 +94,34 @@ async function providerRequest(provider, messages, env) {
   }
 }
 
+async function readBoundedJson(request, maxBytes) {
+  if (!request.body) return { ok: true, text: "" };
+  const reader = request.body.getReader();
+  const chunks = [];
+  let total = 0;
+  try {
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      total += value.byteLength;
+      if (total > maxBytes) {
+        await reader.cancel();
+        return { ok: false, text: "" };
+      }
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+  const bytes = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return { ok: true, text: new TextDecoder().decode(bytes) };
+}
+
 export async function onRequestPost({ request, env }) {
   const origin = request.headers.get("origin");
   if (origin) {
@@ -110,8 +138,16 @@ export async function onRequestPost({ request, env }) {
   const declaredLength = Number(request.headers.get("content-length") || 0);
   if (declaredLength > 32000) return json({ error: "request_too_large", message: "The request is too large." }, 413);
 
+  let rawBody;
+  try {
+    const bounded = await readBoundedJson(request, 32000);
+    if (!bounded.ok) return json({ error: "request_too_large", message: "The request is too large." }, 413);
+    rawBody = bounded.text;
+  } catch {
+    return json({ error: "invalid_request_body", message: "The request body could not be read." }, 400);
+  }
   let payload;
-  try { payload = await request.json(); } catch { return json({ error: "invalid_json", message: "The request body must be valid JSON." }, 400); }
+  try { payload = JSON.parse(rawBody); } catch { return json({ error: "invalid_json", message: "The request body must be valid JSON." }, 400); }
   if (!payload || typeof payload !== "object" || Array.isArray(payload)) return json({ error: "invalid_request", message: "A JSON object is required." }, 400);
   const message = typeof payload.message === "string" ? payload.message.trim() : "";
   if (!message) return json({ error: "message_required", message: "Enter a message first." }, 400);
