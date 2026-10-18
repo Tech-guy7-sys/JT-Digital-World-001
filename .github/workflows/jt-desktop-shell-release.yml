@@ -89,4 +89,5 @@ jobs:
 
             macOS packages are unsigned and may require the user to approve the app in macOS privacy settings. Windows packages are unsigned and may trigger SmartScreen. Linux packages include AppImage and Debian packages.
           files: release-assets/*
+          overwrite_files: true
           fail_on_unmatched_files: true
