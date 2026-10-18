@@ -9,6 +9,7 @@ on:
       - "*.js"
       - "assets/**"
       - "jt-ai-agent/**"
+      - "jt-ai-hub/**"
       - "jt-apps/**"
       - "products/**"
       - "scripts/build-site.mjs"
@@ -85,6 +86,9 @@ jobs:
           test -f dist/jt-apps/jt-stream/studio.css
           test -f dist/jt-ai-agent/workspace.js
           test -f dist/jt-ai-agent/downloads.html
+          test -f dist/jt-ai-hub/index.html
+          grep -q "Compare ChatGPT + Jeff AI" dist/jt-ai-hub/index.html
+          grep -q "Open Microsoft Copilot" dist/jt-ai-hub/index.html
           grep -q 'providerSelect' dist/jt-ai-agent/index.html
           grep -q 'provider:providerSelect.value' dist/jt-ai-agent/workspace.js
           test -f dist/jt-apps/jt-stream/studio.js
