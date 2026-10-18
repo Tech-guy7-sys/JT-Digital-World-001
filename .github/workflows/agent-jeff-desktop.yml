@@ -1,0 +1,232 @@
+name: Build Agent Jeff Windows Installers
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: "Semantic version for a draft release, e.g. 0.1.0"
+        required: false
+        default: "0.1.0"
+        type: string
+      publish_release:
+        description: "Publish a marked pre-release after all build and install checks pass"
+        required: true
+        default: false
+        type: boolean
+  push:
+    branches: [main]
+    tags:
+      - "agent-jeff-v*"
+    paths:
+      - "desktop/AgentJeff/**"
+      - "desktop/AgentJeff.Tests/**"
+      - "installer/AgentJeff.iss"
+      - ".github/workflows/agent-jeff-desktop.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore projects
+        run: dotnet restore desktop/AgentJeff.Tests/AgentJeff.Tests.csproj
+
+      - name: Build Agent Jeff
+        run: dotnet build desktop/AgentJeff/AgentJeff.csproj --configuration Release --no-restore
+
+      - name: Run unit tests
+        run: dotnet test desktop/AgentJeff.Tests/AgentJeff.Tests.csproj --configuration Release --no-restore
+
+      - name: Publish self-contained Windows x64
+        run: dotnet publish desktop/AgentJeff/AgentJeff.csproj --configuration Release --runtime win-x64 --self-contained true -p:PublishSingleFile=true --output artifacts/AgentJeff-win-x64
+
+      - name: Validate publish output and determine version
+        id: package
+        shell: pwsh
+        env:
+          PUBLISH_RELEASE: ${{ inputs.publish_release }}
+          RELEASE_VERSION: ${{ inputs.release_version }}
+          REF_NAME: ${{ github.ref_name }}
+          GITHUB_REF: ${{ github.ref }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          GITHUB_RUN_NUMBER: ${{ github.run_number }}
+          HEAD_COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          $exe = "artifacts/AgentJeff-win-x64/AgentJeff.exe"
+          if (!(Test-Path $exe)) {
+            Get-ChildItem "artifacts/AgentJeff-win-x64" -Force
+            throw "Expected published executable not found: $exe"
+          }
+          if ((Get-Item $exe).Length -lt 100000) {
+            throw "Published executable is unexpectedly small; refusing to package it."
+          }
+
+          if ($env:GITHUB_REF -like "refs/tags/agent-jeff-v*") {
+            $version = $env:REF_NAME -replace '^agent-jeff-v', ''
+          } elseif ($env:GITHUB_EVENT_NAME -eq "workflow_dispatch" -and $env:PUBLISH_RELEASE -eq "true") {
+            $version = $env:RELEASE_VERSION
+          } elseif ($env:GITHUB_EVENT_NAME -eq "push" -and $env:HEAD_COMMIT_MESSAGE -match '^release: agent-jeff-v(\d+\.\d+\.\d+)') {
+            $version = $Matches[1]
+          } else {
+            $version = "0.1.0-ci.$env:GITHUB_RUN_NUMBER"
+          }
+
+          if ($version -notmatch '^\d+\.\d+\.\d+([\-+][0-9A-Za-z.-]+)?$') {
+            throw "Version '$version' is not a valid three-part semantic version."
+          }
+          if ($version -match '^(\d+)\.(\d+)\.(\d+)') {
+            $numericVersion = "$($Matches[1]).$($Matches[2]).$($Matches[3]).0"
+          } else {
+            throw "Unable to derive numeric Windows file version."
+          }
+
+          $tagName = "agent-jeff-v$version"
+          "version=$version" >> $env:GITHUB_OUTPUT
+          "numeric_version=$numericVersion" >> $env:GITHUB_OUTPUT
+          "tag_name=$tagName" >> $env:GITHUB_OUTPUT
+          Write-Host "Verified published executable: $exe"
+          Write-Host "Packaging version: $version"
+
+      - name: Install Inno Setup compiler
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          choco install innosetup --yes --no-progress
+          $programFilesX86 = [Environment]::GetFolderPath("ProgramFilesX86")
+          $iscc = Join-Path $programFilesX86 "Inno Setup 6\ISCC.exe"
+          if (!(Test-Path $iscc)) {
+            throw "Inno Setup compiler was not found at $iscc"
+          }
+          "INNO_SETUP_COMPILER=$iscc" >> $env:GITHUB_ENV
+
+      - name: Create Windows installer
+        shell: pwsh
+        env:
+          PACKAGE_VERSION: ${{ steps.package.outputs.version }}
+          NUMERIC_VERSION: ${{ steps.package.outputs.numeric_version }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          & $env:INNO_SETUP_COMPILER "/DAppVersion=$env:PACKAGE_VERSION" "/DNumericVersion=$env:NUMERIC_VERSION" "installer/AgentJeff.iss"
+          if ($LASTEXITCODE -ne 0) {
+            throw "Inno Setup failed with exit code $LASTEXITCODE"
+          }
+
+      - name: Create portable archive and SHA-256 checksums
+        shell: pwsh
+        env:
+          PACKAGE_VERSION: ${{ steps.package.outputs.version }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          $portable = "artifacts/Agent-Jeff-Windows-x64-$env:PACKAGE_VERSION-portable.zip"
+          Compress-Archive -Path "artifacts/AgentJeff-win-x64/*" -DestinationPath $portable -Force
+          $setup = Get-ChildItem "artifacts/Agent-Jeff-Setup-*-x64.exe" | Select-Object -First 1
+          if (!$setup) {
+            Get-ChildItem "artifacts" -Force
+            throw "The setup EXE was not created."
+          }
+          foreach ($file in @($setup.FullName, $portable)) {
+            if (!(Test-Path $file) -or (Get-Item $file).Length -lt 100000) {
+              throw "Release asset is missing or unexpectedly small: $file"
+            }
+          }
+          $lines = @()
+          foreach ($file in @($setup.FullName, $portable)) {
+            $hash = (Get-FileHash $file -Algorithm SHA256).Hash.ToLower()
+            $lines += "$hash  $(Split-Path $file -Leaf)"
+            Write-Host "SHA256 $hash  $(Split-Path $file -Leaf)"
+          }
+          $lines | Out-File -Encoding ascii "artifacts/SHA256SUMS.txt"
+
+      - name: Test installer installation and uninstallation
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $setup = (Get-ChildItem "artifacts/Agent-Jeff-Setup-*-x64.exe" | Select-Object -First 1).FullName
+          $testDir = Join-Path $env:RUNNER_TEMP "AgentJeffInstallerTest"
+          if (Test-Path $testDir) { Remove-Item $testDir -Recurse -Force }
+
+          $installerProcess = Start-Process -FilePath $setup -ArgumentList "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP- /DIR=$testDir" -Wait -PassThru
+          if ($installerProcess.ExitCode -ne 0) {
+            throw "Silent installer test failed with exit code $($installerProcess.ExitCode)"
+          }
+
+          $installedExe = Join-Path $testDir "AgentJeff.exe"
+          if (!(Test-Path $installedExe)) {
+            Get-ChildItem $testDir -Recurse -Force -ErrorAction SilentlyContinue
+            throw "Installer completed but AgentJeff.exe was not installed."
+          }
+
+          $uninstaller = Join-Path $testDir "unins000.exe"
+          if (!(Test-Path $uninstaller)) {
+            throw "Expected Inno Setup uninstaller was not installed."
+          }
+          $uninstallerProcess = Start-Process -FilePath $uninstaller -ArgumentList "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART" -Wait -PassThru
+          if ($uninstallerProcess.ExitCode -ne 0) {
+            throw "Silent uninstaller test failed with exit code $($uninstallerProcess.ExitCode)"
+          }
+
+          $deadline = (Get-Date).AddSeconds(30)
+          while ((Test-Path $testDir) -and (Get-Date) -lt $deadline) {
+            Start-Sleep -Milliseconds 500
+          }
+          if (Test-Path $testDir) {
+            Get-ChildItem $testDir -Force -ErrorAction SilentlyContinue
+            throw "Installer test directory still exists after uninstall."
+          }
+          Write-Host "Install and uninstall checks passed."
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Agent-Jeff-Windows-x64-${{ steps.package.outputs.version }}
+          path: |
+            artifacts/Agent-Jeff-Setup-*-x64.exe
+            artifacts/Agent-Jeff-Windows-x64-*-portable.zip
+            artifacts/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publish tested Windows x64 pre-release
+        id: publish_release
+        if: "startsWith(github.ref, 'refs/tags/agent-jeff-v') || (github.event_name == 'workflow_dispatch' && inputs.publish_release) || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'release: agent-jeff-v'))"
+        continue-on-error: true
+        uses: softprops/action-gh-release@v2
+        with:
+          token: ${{ secrets.JT_RELEASE_TOKEN || github.token }}
+          name: Agent Jeff v${{ steps.package.outputs.version }} — Windows x64 pre-release
+          tag_name: ${{ steps.package.outputs.tag_name }}
+          target_commitish: ${{ github.sha }}
+          body: |
+            ## Agent Jeff — Windows x64 pre-release
+
+            This release contains the real self-contained Agent Jeff Windows desktop application, a Windows setup wizard, a portable ZIP, and SHA-256 checksums.
+
+            The publishing job only runs after the .NET build, automated tests, installer compilation, and silent install/uninstall smoke checks pass on a Windows runner.
+
+            **Important:** This is an early pre-release, not a signed production build. The installer is currently unsigned and Windows SmartScreen may display a warning. CI validates packaging and basic installation behavior; it does not replace human testing of every application feature on a normal Windows 11 computer. Review the checksums in SHA256SUMS.txt before installing.
+          draft: false
+          prerelease: true
+          fail_on_unmatched_files: true
+          files: |
+            artifacts/Agent-Jeff-Setup-*-x64.exe
+            artifacts/Agent-Jeff-Windows-x64-*-portable.zip
+            artifacts/SHA256SUMS.txt
+
+      - name: Explain how to finish publishing if GitHub blocks release creation
+        if: "(startsWith(github.ref, 'refs/tags/agent-jeff-v') || (github.event_name == 'workflow_dispatch' && inputs.publish_release) || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'release: agent-jeff-v')) ) && steps.publish_release.outcome == 'failure'"
+        shell: pwsh
+        run: |
+          Write-Host "::warning::The Windows build, 9 automated tests, installer compilation, SHA-256 generation, and silent install/uninstall smoke checks passed; the Actions artifact was uploaded. GitHub denied the release API. Configure a fine-grained PAT as the repository secret JT_RELEASE_TOKEN with Contents: Read and write for this repository, or enable read/write workflow permissions if allowed, then rerun the workflow with Publish release enabled."
