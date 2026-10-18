@@ -1,0 +1,99 @@
+name: JT Digital World website CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "*.html"
+      - "*.css"
+      - "*.js"
+      - "assets/**"
+      - "jt-ai-agent/**"
+      - "jt-apps/**"
+      - "scripts/build-site.mjs"
+      - "package.json"
+      - "wrangler.toml"
+      - ".github/workflows/website-ci.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "*.html"
+      - "*.css"
+      - "*.js"
+      - "assets/**"
+      - "jt-ai-agent/**"
+      - "jt-apps/**"
+      - "scripts/build-site.mjs"
+      - "package.json"
+      - "wrangler.toml"
+      - ".github/workflows/website-ci.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build-static-website:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check JavaScript syntax
+        run: |
+          node --check scripts/build-site.mjs
+          node --check jt-ai-agent/workspace.js
+          node --check functions/api/jeff.js
+          node --check jt-apps/jt-stream/studio.js
+          node --check jt-apps/workspace-tools.js
+          node --check jt-apps/pro-workspaces.js
+          grep -q "AI coding-agent handoff" jt-apps/pro-workspaces.js
+          grep -q "Cloud provider connectors" jt-apps/pro-workspaces.js
+          grep -q "Provider and agent compatibility" jt-apps/pro-workspaces.js
+          grep -q "transitionSelect" jt-apps/jt-stream/studio.js
+          grep -q "document.addEventListener(\"keydown\"" jt-apps/jt-stream/studio.js
+          node --check release-downloads.js
+      - name: Test JT AI gateway request validation
+        run: node scripts/test-jeff-api.mjs
+      - name: Build public website files
+        run: npm run build:website
+      - name: Verify required output
+        run: |
+          test -f dist/index.html
+          test -f dist/home.html
+          test -f dist/apps.html
+          test -f dist/style.css
+          test -f dist/jt-apps/jt-stream/studio.html
+          test -f dist/jt-apps/jt-stream/studio.css
+          test -f dist/jt-ai-agent/workspace.js
+          grep -q 'providerSelect' dist/jt-ai-agent/index.html
+          grep -q 'provider:providerSelect.value' dist/jt-ai-agent/workspace.js
+          test -f dist/jt-apps/jt-stream/studio.js
+          test -f dist/jt-apps/workspace-tools.js
+          test -f dist/jt-apps/pro-workspaces.js
+          for app in jt-ai-core jt-app-manager jt-cloud jt-code jt-design jt-motion jt-studio agent-jeff jt-stream; do
+            grep -q 'pro-workspaces.js' "dist/jt-apps/$app/index.html"
+          done
+          for app in jt-ai-core jt-app-manager jt-cloud jt-code jt-design jt-motion jt-studio agent-jeff; do
+            test -f "dist/jt-apps/$app/index.html"
+            grep -q 'data-workspace-tool' "dist/jt-apps/$app/index.html"
+            grep -q 'workspace-tools.js' "dist/jt-apps/$app/index.html"
+          done
+          grep -q 'JT Video &amp; Photo' dist/jt-apps/jt-motion/index.html
+          grep -q 'Open JT Stream Studio' dist/jt-apps/jt-stream/index.html
+          grep -q 'programCanvas' dist/jt-apps/jt-stream/studio.html
+          node --input-type=module <<'NODE'
+          import { readFileSync } from "node:fs";
+          const html = readFileSync("dist/jt-apps/jt-stream/studio.html", "utf8");
+          const js = readFileSync("dist/jt-apps/jt-stream/studio.js", "utf8");
+          const ids = new Set([...html.matchAll(/\bid="([^"]+)"/g)].map((match) => match[1]));
+          const refs = [...new Set([...js.matchAll(/\$\("([^"]+)"\)/g)].map((match) => match[1]))];
+          const missing = refs.filter((id) => !ids.has(id));
+          if (missing.length) {
+            console.error("JT Stream Studio references missing element IDs:", missing.join(", "));
+            process.exit(1);
+          }
+          console.log("JT Stream Studio DOM references verified:", refs.length);
+          NODE
