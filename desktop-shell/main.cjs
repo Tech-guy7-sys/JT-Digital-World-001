@@ -31,6 +31,7 @@ function siteRoot() {
 }
 
 function startLocalServer() {
+  if (server && server.listening && localOrigin) return Promise.resolve(localOrigin);
   const root = siteRoot();
   if (!fs.existsSync(path.join(root, "home.html"))) {
     throw new Error("The packaged JT website files are missing. Rebuild the website bundle.");
