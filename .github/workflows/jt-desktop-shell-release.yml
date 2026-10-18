@@ -1,0 +1,92 @@
+name: Build JT Digital World Desktop installers
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "desktop-shell/**"
+      - "scripts/build-site.mjs"
+      - "home.html"
+      - "index.html"
+      - "jt-apps/**"
+      - ".github/workflows/jt-desktop-shell-release.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: jt-desktop-release
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build ${{ matrix.platform }} package
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: windows
+            runner: windows-latest
+            command: package:win
+          - platform: macOS
+            runner: macos-latest
+            command: package:mac
+          - platform: Linux
+            runner: ubuntu-latest
+            command: package:linux
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build static JT website bundle
+        run: npm run build:website
+      - name: Install desktop packaging dependencies
+        working-directory: desktop-shell
+        run: npm install
+      - name: Build platform installers
+        working-directory: desktop-shell
+        run: npm run ${{ matrix.command }}
+      - name: Upload platform packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: jt-desktop-${{ matrix.platform }}
+          path: desktop-artifacts/*
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    name: Publish cross-platform desktop release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all platform packages
+        uses: actions/download-artifact@v4
+        with:
+          pattern: jt-desktop-*
+          path: release-assets
+          merge-multiple: true
+      - name: List release assets
+        run: ls -lah release-assets
+      - name: Publish stable release
+        uses: softprops/action-gh-release@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: jt-desktop-v0.1.0
+          target_commitish: ${{ github.sha }}
+          name: JT Digital World Desktop v0.1.0
+          prerelease: false
+          draft: false
+          generate_release_notes: true
+          body: |
+            JT Digital World Desktop v0.1.0 bundles the JT browser workspaces in a desktop window for Windows, macOS, and Linux.
+
+            Platform packages are built on their matching GitHub-hosted runners. The package is an offline static-workspace shell; cloud services and the Jeff AI API require an internet connection and configured backend. It is not the native Agent Jeff automation agent.
+
+            macOS packages are unsigned and may require the user to approve the app in macOS privacy settings. Windows packages are unsigned and may trigger SmartScreen. Linux packages include AppImage and Debian packages.
+          files: release-assets/*
+          fail_on_unmatched_files: true
