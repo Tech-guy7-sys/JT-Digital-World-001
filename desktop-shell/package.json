@@ -1,0 +1,85 @@
+{
+  "name": "jt-digital-world-desktop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Cross-platform desktop launcher for the JT Digital World web workspaces",
+  "main": "main.cjs",
+  "author": "J Tech Digital World",
+  "license": "UNLICENSED",
+  "scripts": {
+    "package:win": "electron-builder --win nsis zip",
+    "package:mac": "electron-builder --mac dmg zip",
+    "package:linux": "electron-builder --linux AppImage deb"
+  },
+  "devDependencies": {
+    "electron": "37.2.6",
+    "electron-builder": "26.0.12"
+  },
+  "build": {
+    "appId": "world.jtechdigital.desktop",
+    "productName": "JT Digital World",
+    "asar": true,
+    "files": [
+      "main.cjs",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "../dist",
+        "to": "site",
+        "filter": ["**/*"]
+      }
+    ],
+    "directories": {
+      "output": "../desktop-artifacts",
+      "buildResources": "build"
+    },
+    "artifactName": "JT-Digital-World-${version}-${arch}.${ext}",
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        },
+        {
+          "target": "zip",
+          "arch": ["x64"]
+        }
+      ]
+    },
+    "nsis": {
+      "artifactName": "JT-Digital-World-Setup-${version}-x64.${ext}",
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["x64", "arm64"]
+        },
+        {
+          "target": "zip",
+          "arch": ["x64", "arm64"]
+        }
+      ],
+      "category": "public.app-category.productivity"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": ["x64"]
+        },
+        {
+          "target": "deb",
+          "arch": ["x64"]
+        }
+      ],
+      "category": "Utility",
+      "synopsis": "JT Digital World desktop workspace"
+    }
+  }
+}
