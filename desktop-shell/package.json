@@ -72,6 +72,7 @@
         {
           "target": "AppImage",
           "arch": ["x64"]
+        }
       ],
       "category": "Utility",
       "synopsis": "JT Digital World desktop workspace"
