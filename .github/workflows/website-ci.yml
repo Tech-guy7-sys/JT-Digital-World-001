@@ -27,6 +27,8 @@ on:
       - "jt-ai-agent/**"
       - "jt-apps/**"
       - "scripts/build-site.mjs"
+      - "scripts/test-jeff-api.mjs"
+      - "functions/**"
       - "package.json"
       - "wrangler.toml"
       - ".github/workflows/website-ci.yml"
