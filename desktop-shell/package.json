@@ -8,8 +8,8 @@
   "license": "UNLICENSED",
   "scripts": {
     "package:win": "electron-builder --win nsis zip",
-    "package:mac": "electron-builder --mac dmg zip",
-    "package:linux": "electron-builder --linux AppImage deb"
+    "package:mac": "electron-builder --mac dmg",
+    "package:linux": "electron-builder --linux AppImage"
   },
   "devDependencies": {
     "electron": "37.2.6",
