@@ -3,10 +3,10 @@
 The `POST /api/jeff` endpoint is a server-side provider gateway. It remains disabled unless explicitly enabled and all security gates pass.
 
 ## Supported provider adapters
-- **OpenAI**: secret `OPENAI_API_KEY`; optional `OPENAI_BASE_URL` and `OPENAI_MODEL`.
+- **OpenAI**: secret `OPENAI_API_KEY`; optional `OPENAI_BASE_URL` and `OPENAI_MODEL`. The JT AI Hub default is GPT Luna (`gpt-6-luna`).
 - **Ollama / Jeff AI**: `OLLAMA_BASE_URL` and optional `OLLAMA_MODEL`. Cloudflare cannot reach a user's PC localhost; use a secured, reachable gateway. Never expose an unauthenticated Ollama port.
 - **Anthropic**: secret `ANTHROPIC_API_KEY`; optional `ANTHROPIC_MODEL`.
-- **Gemini**: secret `GEMINI_API_KEY`; optional `GEMINI_MODEL`.
+- **Gemini**: secret `GEMINI_API_KEY`; optional `GEMINI_MODEL`. The JT AI Hub default is Gemini 2.5 Flash (`gemini-2.5-flash`).
 - The free Microsoft Copilot consumer app does not expose a documented general-purpose chat API for this integration. The UI uses manual handoff instead.
 
 ## Required security setup before enabling
