@@ -28,7 +28,7 @@ const publicFiles = [
   "_headers"
 ];
 
-const publicDirectories = ["assets", "jt-ai-agent", "jt-apps", "products"];
+const publicDirectories = ["assets", "jt-ai-agent", "jt-ai-hub", "jt-apps", "products"];
 
 await rm(out, { recursive: true, force: true });
 await mkdir(out, { recursive: true });
