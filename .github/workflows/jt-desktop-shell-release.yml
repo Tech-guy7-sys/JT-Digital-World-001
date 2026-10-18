@@ -9,6 +9,8 @@ on:
       - "home.html"
       - "index.html"
       - "jt-apps/**"
+      - "jt-ai-hub/**"
+      - "jt-ai-agent/**"
       - ".github/workflows/jt-desktop-shell-release.yml"
   workflow_dispatch:
 
