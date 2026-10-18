@@ -70,6 +70,7 @@ jobs:
           test -f dist/jt-apps/jt-stream/studio.html
           test -f dist/jt-apps/jt-stream/studio.css
           test -f dist/jt-ai-agent/workspace.js
+          test -f dist/jt-ai-agent/downloads.html
           grep -q 'providerSelect' dist/jt-ai-agent/index.html
           grep -q 'provider:providerSelect.value' dist/jt-ai-agent/workspace.js
           test -f dist/jt-apps/jt-stream/studio.js
