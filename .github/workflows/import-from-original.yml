@@ -28,7 +28,7 @@ jobs:
         run: |
           set -euo pipefail
           git clone --depth 1 https://github.com/Tech-guy7-sys/jt-digital-world.git /tmp/jt-source
-          rsync -a --exclude='.git/' /tmp/jt-source/ ./
+          rsync -a --exclude='.git/' --exclude='.github/workflows/' /tmp/jt-source/ ./
           git status --short
 
       - name: Commit imported project
