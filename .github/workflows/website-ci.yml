@@ -52,6 +52,12 @@ jobs:
           node --check jt-apps/pro-workspaces.js
           grep -q "sessionProjectImport" jt-apps/pro-workspaces.js
           grep -q "mediaProjectImport" jt-apps/pro-workspaces.js
+          grep -q "seq-play" jt-apps/pro-workspaces.js
+          grep -q "jt-pro-sequence-track" jt-apps/pro-workspaces.js
+          grep -q "media-render" jt-apps/pro-workspaces.js
+          grep -q "jt-pro-edit-lane" jt-apps/pro-workspaces.js
+          grep -q "studio.svg" jt-apps/jt-studio/index.html
+          grep -q "video-photo.svg" jt-apps/jt-motion/index.html
           grep -q "Imported session with" jt-apps/pro-workspaces.js
           grep -q "Imported .*clip records" jt-apps/pro-workspaces.js
           node --check products/site.js
