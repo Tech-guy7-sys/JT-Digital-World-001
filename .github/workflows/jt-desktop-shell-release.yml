@@ -81,7 +81,7 @@ jobs:
       - name: Publish stable release
         uses: softprops/action-gh-release@v2
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.JT_RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
           tag_name: jt-desktop-v0.1.0
           target_commitish: ${{ github.sha }}
           name: JT Digital World Desktop v0.1.0
