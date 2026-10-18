@@ -1,0 +1,66 @@
+name: Build JT AI Hub Windows app
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "desktop-ai-hub/**"
+      - ".github/workflows/jt-ai-hub-desktop.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: jt-ai-hub-desktop-release
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: desktop-ai-hub/package.json
+      - name: Install packaging dependencies
+        working-directory: desktop-ai-hub
+        run: npm install
+      - name: Build Windows installer
+        working-directory: desktop-ai-hub
+        run: npm run package:win
+      - name: Generate checksum
+        shell: pwsh
+        run: |
+          $file = Get-ChildItem desktop-ai-hub-artifacts/JT-AI-Hub-Setup-0.1.0-x64.exe
+          $hash = (Get-FileHash $file.FullName -Algorithm SHA256).Hash.ToLower()
+          "$hash  $($file.Name)" | Out-File desktop-ai-hub-artifacts/SHA256SUMS.txt -Encoding ascii
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: jt-ai-hub-windows-installer
+          path: desktop-ai-hub-artifacts/*
+          if-no-files-found: error
+          retention-days: 14
+      - name: Publish Windows release
+        uses: softprops/action-gh-release@v2
+        with:
+          token: ${{ secrets.JT_RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
+          tag_name: jt-ai-hub-v0.1.0
+          target_commitish: ${{ github.sha }}
+          name: JT AI Hub v0.1.0
+          prerelease: false
+          draft: false
+          generate_release_notes: true
+          body: |
+            Dedicated Windows desktop wrapper for the hosted JT AI Hub workspace.
+            Requires an internet connection. The consumer Microsoft Copilot handoff is manual.
+            The Jeff AI API remains unavailable until server-side authentication, rate limiting, and provider configuration are completed.
+            The installer is unsigned and may trigger Windows SmartScreen.
+          files: desktop-ai-hub-artifacts/*
+          overwrite_files: true
+          fail_on_unmatched_files: true
