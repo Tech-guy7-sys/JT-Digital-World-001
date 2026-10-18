@@ -42,6 +42,6 @@ assert.equal((await response.json()).error, "service_disabled");
 
 response = await invoke({ message: "hello", provider: "openai" }, "https://jt.example", { JEFF_API_ENABLED: "true" });
 assert.equal(response.status, 503);
-assert.equal((await response.json()).error, "provider_not_configured");
+assert.equal((await response.json()).error, "security_not_configured");
 
 console.log("JT AI gateway validation tests passed.");
