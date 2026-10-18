@@ -6,7 +6,7 @@
   const setupLink = document.getElementById("agent-jeff-setup-download");
   const portableLink = document.getElementById("agent-jeff-portable-download");
   const checksumLink = document.getElementById("agent-jeff-checksums-download");
-  const releasesPage = "https://github.com/Tech-guy7-sys/jt-digital-world/releases";
+  const windowsSetupFallback = "https://github.com/Tech-guy7-sys/jt-digital-world/releases/download/agent-jeff-v0.1.0/Agent-Jeff-Setup-0.1.0-x64.exe";
   [setupLink, portableLink, checksumLink].forEach((link) => {
     if (link) link.style.display = "none";
   });
@@ -68,9 +68,12 @@
         checksumLink.style.display = "flex";
       }
     } catch (error) {
-      unavailable("Could not check published assets right now. Use the official GitHub Releases page.");
-      const fallback = document.querySelector('#agent-jeff-downloads a[href="' + releasesPage + '"]');
-      if (fallback) fallback.textContent = "Open official GitHub Releases ↗";
+      unavailable("Automatic release check is temporarily unavailable. Use the direct Windows installer link above or try again shortly.");
+      if (setupLink) {
+        setupLink.href = windowsSetupFallback;
+        setupLink.hidden = false;
+        setupLink.style.display = "flex";
+      }
     }
   }
 
