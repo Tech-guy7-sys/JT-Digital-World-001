@@ -1,0 +1,34 @@
+<Window x:Class="AgentJeff.VoiceCompanionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Agent Jeff · Voice Companion" Width="440" Height="350"
+        WindowStyle="None" ResizeMode="NoResize" Topmost="True"
+        ShowInTaskbar="True" WindowStartupLocation="CenterScreen"
+        Background="#090B16" Foreground="#F4F5FF">
+  <Border BorderBrush="#5963A8" BorderThickness="1" CornerRadius="24" Padding="22" Background="#11152A">
+    <Border.Effect>
+      <DropShadowEffect Color="#6876FF" BlurRadius="26" ShadowDepth="0" Opacity="0.24"/>
+    </Border.Effect>
+    <Grid>
+      <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+      <DockPanel>
+        <Border Background="#252A4A" CornerRadius="10" Padding="10" DockPanel.Dock="Left"><TextBlock Text="JT" FontSize="17" FontWeight="Bold" Foreground="#AEB5FF"/></Border>
+        <StackPanel Margin="12,0,0,0" VerticalAlignment="Center"><TextBlock Text="Agent Jeff" FontSize="20" FontWeight="SemiBold"/><TextBlock Text="DESKTOP COMPANION" FontSize="10" Foreground="#A4A9C5" Margin="0,3,0,0"/></StackPanel>
+        <Button Content="×" Click="Hide_Click" Width="34" Height="34" Padding="0" HorizontalAlignment="Right" Background="#292F50" Foreground="White" BorderThickness="0" FontSize="18"/>
+      </DockPanel>
+      <StackPanel Grid.Row="1" VerticalAlignment="Center" Margin="0,15">
+        <Grid Width="74" Height="74" HorizontalAlignment="Center" Margin="0,0,0,13">
+          <Ellipse Fill="#292F50" Stroke="#626DD2" StrokeThickness="1.5"/>
+          <Ellipse Margin="8" Fill="#252A4A" Stroke="#929BFF" StrokeThickness="1"/>
+          <Ellipse Margin="19" Fill="#929BFF" Opacity="0.95">
+            <Ellipse.Effect><DropShadowEffect Color="#929BFF" BlurRadius="20" ShadowDepth="0" Opacity="0.8"/></Ellipse.Effect>
+          </Ellipse>
+        </Grid>
+        <TextBlock Text="Ready when you are." FontSize="22" FontWeight="SemiBold" TextWrapping="Wrap" TextAlignment="Center"/>
+        <TextBlock Text="This panel stays above normal windows only while your Windows session is unlocked. It cannot appear on the secure Windows sign-in screen." Foreground="#B6BAD1" TextWrapping="Wrap" TextAlignment="Center" Margin="0,10,0,0" LineHeight="21"/>
+        <Border Background="#302719" CornerRadius="10" Padding="10" Margin="0,11,0,0"><TextBlock Text="Speaker verification is not enabled yet." Foreground="#FFD38A" TextWrapping="Wrap" TextAlignment="Center" FontSize="11"/></Border>
+      </StackPanel>
+      <Button Grid.Row="2" Content="STOP &amp; HIDE COMPANION" Click="Hide_Click" Height="42" Background="#929BFF" Foreground="#101326" BorderThickness="0" FontWeight="SemiBold"/>
+    </Grid>
+  </Border>
+</Window>

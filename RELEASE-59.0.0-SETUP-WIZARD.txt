@@ -1,0 +1,6 @@
+JT Digital World v59 — Setup Wizard integrated release
+
+Includes the v58 commercial-conversion project plus the Windows Setup Center / graphical Setup Wizard.
+The wizard can check/install Node.js LTS, Git and Ollama (when winget is available), configure local AI/update settings, install dependencies, schedule the JT Command Agent, and build all 9 Windows app installers.
+
+Windows .exe installers are generated locally by Electron Builder; this source package does not claim to contain prebuilt signed .exe files.

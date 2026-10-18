@@ -1,0 +1,5 @@
+JT Digital World visual integration update
+
+The shared modern UI stylesheet now places the local JT device artwork inside interior page hero sections, strengthens the JT monogram mark, and keeps app dashboard images visible as actual card imagery. The homepage and app pages retain their existing real page markup and interactive links.
+
+Reference artwork is included at public/assets/jt-modern-homepage-visual-reference.png.

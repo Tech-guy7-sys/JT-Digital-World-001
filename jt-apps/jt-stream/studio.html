@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#090a12">
+  <meta name="description" content="JT Stream Studio — camera scenes, screen sharing, overlays and local recording.">
+  <title>JT Stream Studio — JT Digital World</title>
+  <link rel="stylesheet" href="../app.css">
+  <link rel="stylesheet" href="studio.css">
+</head>
+<body>
+  <header class="studio-topbar">
+    <a class="studio-brand" href="/jt-apps/jt-stream/">
+      <span class="brand-mark">JT</span>
+      <span><strong>JT Stream</strong><small>STUDIO · EARLY ACCESS</small></span>
+    </a>
+    <div class="top-status"><span class="status-dot" id="liveDot"></span><span id="topStatus">Studio ready · not recording</span></div>
+    <nav><a href="/jt-apps/jt-stream/">Overview</a><a href="/jt-apps/">All JT apps</a></nav>
+  </header>
+
+  <main class="studio-shell">
+    <section class="studio-heading">
+      <div>
+        <div class="eyebrow">JT CREATOR WORKSPACE / STAGE 01</div>
+        <h1>Make the moment <span>yours.</span></h1>
+        <p>Build a camera scene, share your screen, brand the frame, and record a local video. Camera and microphone access starts only when you choose it.</p>
+      </div>
+      <div class="beta-chip"><span></span> LOCAL STUDIO BETA</div>
+    </section>
+
+    <div class="permission-note" id="permissionNote" role="status">
+      <strong>Before you begin</strong>
+      <span>Use this page on HTTPS or localhost. Select Enable camera to request camera and microphone permission. Nothing is broadcast to the internet.</span>
+    </div>
+
+    <section class="studio-grid" aria-label="JT Stream studio workspace">
+      <aside class="panel source-panel">
+        <div class="panel-heading"><div><span class="panel-kicker">01 / INPUTS</span><h2>Sources</h2></div><span class="step-number">01</span></div>
+
+        <div class="source-card">
+          <div class="source-title"><span class="source-icon camera-icon">◉</span><div><strong>Camera</strong><small id="cameraStatus">Not connected</small></div><span class="source-lamp" id="cameraLamp"></span></div>
+          <label for="cameraSelect">Camera device</label>
+          <select id="cameraSelect"><option value="">Default camera</option></select>
+          <button class="wide-button" id="cameraButton">Enable camera + microphone</button>
+        </div>
+
+        <div class="source-card">
+          <div class="source-title"><span class="source-icon screen-icon">▣</span><div><strong>Screen share</strong><small id="screenStatus">Not sharing</small></div><span class="source-lamp" id="screenLamp"></span></div>
+          <label for="screenAudio"><input type="checkbox" id="screenAudio"> Include shared-tab audio when available</label>
+          <button class="wide-button secondary-button" id="screenButton">Share screen or window</button>
+        </div>
+
+        <div class="source-card compact-card">
+          <div class="source-title"><span class="source-icon mic-icon">♬</span><div><strong>Microphone</strong><small id="micStatus">Not connected</small></div></div>
+          <label for="micSelect">Microphone device</label>
+          <select id="micSelect"><option value="">Default microphone</option></select>
+          <div class="slider-label"><label for="micGain">Mic gain</label><output id="micGainValue">100%</output></div>
+          <input id="micGain" type="range" min="0" max="200" value="100" step="5">
+          <div class="meter-label"><span>INPUT LEVEL</span><span id="micLevelLabel">Waiting for input</span></div>
+          <div class="audio-meter"><span id="micMeter"></span></div>
+        </div>
+
+        <div class="panel-footnote"><span class="privacy-shield">✓</span> Camera and audio stay on this device until you save a recording.</div>
+      </aside>
+
+      <section class="preview-column">
+        <div class="panel preview-panel">
+          <div class="preview-head">
+            <div><span class="panel-kicker">LIVE CANVAS</span><h2>Program preview</h2></div>
+            <div class="preview-badges"><span class="mini-badge" id="resolutionBadge">1280 × 720</span><span class="rec-indicator" id="recIndicator"><i></i> REC OFF</span></div>
+          </div>
+          <div class="canvas-frame">
+            <canvas id="programCanvas" width="1280" height="720" aria-label="JT Stream program preview"></canvas>
+            <video id="cameraVideo" autoplay muted playsinline></video>
+            <video id="screenVideo" autoplay muted playsinline></video>
+            <div class="canvas-placeholder" id="canvasPlaceholder"><span class="placeholder-logo">JT</span><strong>Your studio, ready when you are.</strong><small>Enable a camera or share a screen to start building the frame.</small></div>
+          </div>
+          <div class="canvas-bottomline"><span><i class="green-dot"></i><span id="previewStatus">Preview canvas ready</span></span><span id="frameRateStatus">30 FPS target</span></div>
+        </div>
+
+        <div class="panel scene-panel">
+          <div class="panel-heading"><div><span class="panel-kicker">02 / COMPOSITION</span><h2>Scenes</h2></div><span class="scene-help">Choose a layout</span></div>
+          <div class="scene-list" role="group" aria-label="Choose a scene layout">
+            <button class="scene-choice selected" data-scene="camera" aria-pressed="true"><span class="scene-thumb camera-thumb"><i></i></span><strong>Camera</strong><small>Full frame</small></button>
+            <button class="scene-choice" data-scene="screen" aria-pressed="false"><span class="scene-thumb screen-thumb"><i></i></span><strong>Screen</strong><small>Presentation</small></button>
+            <button class="scene-choice" data-scene="pip" aria-pressed="false"><span class="scene-thumb pip-thumb"><i></i><b></b></span><strong>Picture-in-picture</strong><small>Screen + camera</small></button>
+          </div>
+          <div class="scene-actions"><button class="text-button" id="snapshotButton">↧ Save still frame</button><span id="snapshotStatus">PNG snapshot</span></div>
+          <div class="inspector-section jt-hotkey-panel">
+            <span class="panel-kicker">FAST CONTROL</span>
+            <label for="transitionSelect">Scene transition</label>
+            <select id="transitionSelect"><option value="cut">Cut</option><option value="fade">Fade to black · 260 ms</option></select>
+            <div class="hotkey-grid">
+              <span><kbd>Alt</kbd> + <kbd>1</kbd> Camera</span>
+              <span><kbd>Alt</kbd> + <kbd>2</kbd> Screen</span>
+              <span><kbd>Alt</kbd> + <kbd>3</kbd> Picture-in-picture</span>
+              <span><kbd>Alt</kbd> + <kbd>S</kbd> Snapshot</span>
+              <span><kbd>Alt</kbd> + <kbd>R</kbd> Record / stop</span>
+            </div>
+            <small>Broadcast output is not enabled in this browser build. Recording is local.</small>
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel inspector-panel">
+        <div class="panel-heading"><div><span class="panel-kicker">03 / BRANDING</span><h2>Scene inspector</h2></div><span class="step-number">03</span></div>
+
+        <div class="inspector-section">
+          <label for="showTitle">Main title</label>
+          <input id="showTitle" type="text" maxlength="90" value="Your story. Your stream." placeholder="Add a title">
+          <label for="showSubtitle">Subtitle / lower third</label>
+          <input id="showSubtitle" type="text" maxlength="120" value="LIVE FROM JT STREAM" placeholder="Add a subtitle">
+          <label class="toggle-row" for="overlayToggle"><span><strong>Branded lower third</strong><small>Show title and JT mark</small></span><input id="overlayToggle" type="checkbox" checked></label>
+        </div>
+
+        <div class="inspector-section">
+          <span class="panel-kicker">OUTPUT PROFILE</span>
+          <label for="resolutionSelect">Canvas resolution</label>
+          <select id="resolutionSelect"><option value="720">1280 × 720 · HD</option><option value="1080">1920 × 1080 · Full HD</option></select>
+          <label for="fpsSelect">Frame-rate target</label>
+          <select id="fpsSelect"><option value="24">24 FPS · cinematic</option><option value="30" selected>30 FPS · balanced</option><option value="60">60 FPS · smooth</option></select>
+          <p class="field-note">The canvas and recording use this output profile. Actual camera frame rate also depends on your device and browser.</p>
+        </div>
+
+        <div class="inspector-section profile-section">
+          <span class="panel-kicker">WORKSPACE PROFILE</span>
+          <button class="wide-button secondary-button" id="saveProfileButton">Save profile on this device</button>
+          <div class="profile-buttons"><button class="text-button" id="exportProfileButton">Export JSON</button><button class="text-button" id="importProfileButton">Import JSON</button></div>
+          <input type="file" id="profileFile" accept="application/json,.json" hidden>
+          <small class="profile-note" id="profileStatus">Profiles are stored in this browser only.</small>
+        </div>
+      </aside>
+    </section>
+
+    <section class="recording-bar panel">
+      <div class="recording-copy"><span class="panel-kicker">04 / CAPTURE</span><strong id="recordingHeadline">Record a local session</strong><small id="recordingHelp">Saves a WebM video file to your device. No online broadcast is started.</small></div>
+      <div class="recording-controls"><div class="record-time" id="recordTime">00:00</div><button class="record-button" id="recordButton"><i></i> Start recording</button><button class="stop-button" id="stopButton" disabled>Stop and save</button></div>
+    </section>
+
+    <section class="stage-boundary">
+      <span class="boundary-mark">i</span>
+      <div><strong>What works in this first build</strong><p>Camera preview, screen sharing, camera/screen/PiP scenes, title overlay, microphone gain, local profile save/import/export, still-frame capture, and local video recording.</p></div>
+      <div class="stage-next"><strong>Next stage</strong><p>Real RTMP/RTMPS output needs a separate streaming engine or media relay. It is intentionally not shown as a working control here. Virtual camera, advanced effects, and platform integrations also remain future work.</p></div>
+    </section>
+
+    <footer class="studio-footer"><span>© 2026 JT Digital World · JT Stream Studio</span><span>Camera and recording controls are user-initiated.</span><a href="/jt-apps/jt-stream/">Back to JT Stream overview ↗</a></footer>
+  </main>
+
+  <script src="studio.js"></script>
+</body>
+</html>

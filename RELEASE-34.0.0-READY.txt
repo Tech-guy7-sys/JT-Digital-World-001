@@ -1,0 +1,12 @@
+JT DIGITAL WORLD — RELEASE 34.0.0
+
+Release automation has been added.
+
+To publish the first real desktop release:
+1. Push this project to GitHub.
+2. Create tag v34.0.0 or run the JT Desktop Release workflow manually.
+3. GitHub Actions builds Windows and macOS artifacts.
+4. Add production code-signing/notarization credentials before public distribution.
+5. Configure the Cloudflare update-manifest variables with the resulting artifact URLs and SHA-256 hashes.
+
+The repository intentionally does not contain signing credentials or fake release URLs.

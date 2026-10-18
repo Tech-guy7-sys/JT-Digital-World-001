@@ -1,0 +1,15 @@
+JT Digital World v44.0.0 — Rich Multi-Page Website
+
+This release expands every public website section so pages are substantive rather than sparse.
+Home remains focused. Apps, Features, About, Support, Download and Sign In are dedicated pages.
+Tutorials remain inside the individual JT desktop apps; the public website does not host product tutorials.
+Public pricing/offers remain out of the website.
+
+Rich pages include:
+- Apps: nine products, previews, app capabilities, Jeff AI/in-app tutorial badges, connected workflow section.
+- Features: six major capability areas plus platform experience and control sections.
+- About: direction, Jeff AI philosophy, ecosystem roles and product-family overview.
+- Support: help paths, account, installation, contact, status and diagnostics.
+- Download: desktop release information, channels, install/sign-in/manage workflow.
+- Sign In: account purpose, access, connected services, security and settings information.
+- Home: focused hero, ecosystem introduction and three concise platform pillars; no full-page content dump.

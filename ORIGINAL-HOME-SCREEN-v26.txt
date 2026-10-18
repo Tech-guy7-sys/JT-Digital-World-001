@@ -1,0 +1,16 @@
+JT DIGITAL WORLD — ORIGINAL HOME SCREEN v26
+
+The public website home screen has been rebuilt to closely match the original reference design supplied/generated for JT Digital World.
+
+Reference characteristics:
+- Dark JT Digital World header with JT logo and Build · Create · Work · Grow tagline.
+- Navigation: Home, Apps, Features, About, Support.
+- Download Now and Sign In actions.
+- Hero: THE COMPLETE AI-POWERED PRODUCTIVITY ECOSYSTEM.
+- Main title: JT Digital World / Your AI-Powered Future.
+- Scenic mountain/lake hero with laptop and phone showing the JT ecosystem.
+- Five feature blocks: AI-Powered, Privacy First, All-in-One, Cross-Device, Always Evolving.
+- Light JT Apps section with all eight apps in a single desktop row.
+- Dark footer matching the reference direction.
+
+The reference image is kept in Website/public/assets/jt-original-home-hero-visual.jpg as the scenic hero visual only; the text, navigation, feature strip and app cards remain real HTML so the page remains functional.

@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "owner": "JT Digital World",
+  "monitoringPolicy": {
+    "scheduledRunsPerDay": 5,
+    "scope": "repository-static-audit",
+    "productionChanges": "disabled",
+    "unknownEndpoints": "skip-and-report"
+  },
+  "targets": [
+    {
+      "id": "jt-ai-agent",
+      "name": "JT AI Agent",
+      "type": [
+        "website",
+        "web-app",
+        "backend"
+      ],
+      "endpoint": null,
+      "status": "endpoint-needed"
+    },
+    {
+      "id": "jt-code",
+      "name": "JT Code",
+      "type": [
+        "website",
+        "desktop-app",
+        "backend"
+      ],
+      "endpoint": null,
+      "status": "endpoint-needed"
+    },
+    {
+      "id": "agent-jeff",
+      "name": "Agent Jeff",
+      "type": [
+        "website",
+        "desktop-app",
+        "optional-android-companion"
+      ],
+      "endpoint": null,
+      "status": "endpoint-needed"
+    },
+    {
+      "id": "jt-studio",
+      "name": "JT Studio",
+      "type": [
+        "website",
+        "desktop-app",
+        "backend"
+      ],
+      "endpoint": null,
+      "status": "endpoint-needed"
+    },
+    {
+      "id": "jt-design",
+      "name": "JT Design",
+      "type": [
+        "website",
+        "web-app",
+        "backend"
+      ],
+      "endpoint": null,
+      "status": "endpoint-needed"
+    },
+    {
+      "id": "jt-motion",
+      "name": "JT Motion",
+      "type": [
+        "website",
+        "desktop-app",
+        "backend"
+      ],
+      "endpoint": null,
+      "status": "endpoint-needed"
+    },
+    {
+      "id": "jt-cloud",
+      "name": "JT Cloud",
+      "type": [
+        "website",
+        "web-app",
+        "backend"
+      ],
+      "endpoint": null,
+      "status": "endpoint-needed"
+    },
+    {
+      "id": "jt-app-manager",
+      "name": "JT App Manager",
+      "type": [
+        "website",
+        "desktop-app",
+        "backend"
+      ],
+      "endpoint": null,
+      "status": "endpoint-needed"
+    },
+    {
+      "id": "jt-stream",
+      "name": "JT Stream",
+      "type": [
+        "website",
+        "desktop-app",
+        "backend"
+      ],
+      "endpoint": null,
+      "status": "endpoint-needed"
+    },
+    {
+      "id": "jt-ai-core",
+      "name": "JT AI Core",
+      "type": [
+        "website",
+        "backend"
+      ],
+      "endpoint": null,
+      "status": "endpoint-needed"
+    }
+  ],
+  "notes": [
+    "Do not invent endpoints. Populate endpoint only with verified public health-check URLs.",
+    "Desktop and mobile runtime monitoring requires telemetry/crash reporting integration.",
+    "AI feedback replies require a configured support channel and an approved AI provider.",
+    "Autonomous code repair and deployment are intentionally disabled until tests and approval policy are configured."
+  ]
+}

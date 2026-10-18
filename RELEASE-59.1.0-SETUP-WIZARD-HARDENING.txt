@@ -1,0 +1,9 @@
+JT Digital World v59.1 — Setup Wizard Hardening
+
+- Fixed persistent user environment-variable updates in PowerShell.
+- Added PATH refresh after winget installations.
+- Added architecture and administrator-status diagnostics.
+- Improved scheduled-task error handling.
+- Updated Build/package.json suite version to 59.0.0.
+- Preserved local-only handling of API/update configuration.
+- Setup remains a source/build workflow; final signed EXEs are produced on Windows.

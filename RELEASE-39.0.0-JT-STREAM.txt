@@ -1,0 +1,12 @@
+JT Digital World v39.0.0
+
+New app: JT Stream
+- Professional live-production workspace
+- Scenes, sources, program preview, audio mixer, stream health
+- Camera/screen capture and local recording
+- Jeff AI suggestions and interactive tutorial area
+- YouTube/Twitch/custom RTMP/SRT destination UI
+- FFmpeg detection hook for native streaming bridge
+- Added JT Stream to shared app catalog and website app section
+
+Verification target: syntax, website references, package integrity.

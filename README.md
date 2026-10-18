@@ -1,1 +1,2 @@
-# JT-Digital-World-001
+# jt-digital-world
+Official JT Digital World website and application downloads

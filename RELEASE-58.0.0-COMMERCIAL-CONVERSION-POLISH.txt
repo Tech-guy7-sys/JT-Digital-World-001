@@ -1,0 +1,14 @@
+JT Digital World v58 — Commercial Conversion Polish
+
+Implemented in the actual Windows project source:
+- Stronger homepage conversion path: Explore → Try → Upgrade
+- App-specific billing explanation
+- Interactive offer cards with plan-fit guidance
+- Premium recommended-start positioning
+- Yearly savings display
+- Secure checkout/app-specific access reassurance
+- Checkout button loading state
+- Free-first upgrade messaging
+- JT Stream added to preview app catalog
+
+This release improves legitimate conversion clarity; it does not claim or guarantee that every visitor will purchase.

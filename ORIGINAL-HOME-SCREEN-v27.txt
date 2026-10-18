@@ -1,0 +1,14 @@
+JT Digital World — Original Home Screen v27
+
+This version matches the very first JT Digital World website reference:
+- dark navy header with JT Digital World branding
+- Build · Create · Work · Grow tagline
+- Home / Apps / Features / About / Support navigation
+- Download Now / Sign In buttons
+- scenic mountain hero with laptop + phone JT ecosystem visual
+- JT Digital World / Your AI-Powered Future headline
+- five feature blocks
+- light JT Apps section with eight app cards
+- dark compact footer
+
+The supplied reference image is used only as a visual design reference; the website remains real HTML/CSS and the app cards/buttons remain functional links.

@@ -1,0 +1,30 @@
+JT DIGITAL WORLD — RELEASE 60.0.0
+
+Official workspace architecture + JTech AI Core provider routing.
+
+Workspace tiers:
+- Free -> Beginner Workspace
+- Student -> Student Workspace
+- Premium -> Creator Workspace
+- Pro -> Professional Workspace
+- Business -> Business Workspace
+
+JTech AI Core internal provider pool:
+- Free: Gemini + Ollama
+- Student: Gemini + Ollama + Minimax
+- Premium: Free providers + OpenRouter + Hugging Face
+- Pro: Premium providers + Cloudflare AI + Groq
+- Business: Pro providers + OpenAI
+
+End users see only JTech AI Core / Jeff AI. Provider names and routing details are hidden from normal product UI.
+
+Setup Wizard:
+- Prerequisite checks and optional installation via winget
+- JTech AI Core credential configuration
+- Local entitlement selection for testing
+- Website/release configuration
+- Dependency installation
+- Optional Command Agent task
+- Optional build of all 9 Windows installers
+
+Provider quotas, availability, pricing and commercial terms remain subject to the respective providers.

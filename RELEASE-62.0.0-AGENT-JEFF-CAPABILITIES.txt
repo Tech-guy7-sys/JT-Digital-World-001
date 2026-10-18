@@ -1,0 +1,9 @@
+JT DIGITAL WORLD — RELEASE 62.0.0
+Agent Jeff file analysis and assistant capability improvements
+
+- Added text and source-code attachments to the Agent Jeff chat panel.
+- Added per-file and attachment-count limits with unsupported/oversized file handling.
+- Expanded Jeff AI guidance for document synthesis, code review, debugging, planning, and complete artifact output.
+- Fixed the missing getWorkspace import in Agent Jeff's main process.
+- Added explicit notes about capability boundaries and the Cloudflare Pages/D1 sign-in deployment workflow.
+- No live website deployment or Windows installer build is claimed by this release package.

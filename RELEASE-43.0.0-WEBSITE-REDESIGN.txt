@@ -1,0 +1,8 @@
+JT Digital World v43 — Modern Multi-Page Website
+
+- Rebuilt public website navigation as dedicated pages.
+- Home is intentionally focused instead of containing every section.
+- Apps, Features, About, Support, Download and Sign In are separate pages.
+- Tutorials are explicitly kept inside the individual JT apps.
+- Public website continues to exclude app pricing/offers.
+- Nine JT apps are represented, including JT Stream.

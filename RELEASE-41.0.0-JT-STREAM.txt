@@ -1,0 +1,16 @@
+JT DIGITAL WORLD v41.0.0 — JT STREAM PRODUCTION OUTPUTS
+
+Added:
+- Multi-destination RTMP/RTMPS/SRT output in one live session.
+- NVIDIA NVENC, AMD AMF, Intel Quick Sync and CPU x264 encoder selection when available through installed FFmpeg.
+- Auto encoder recommendation based on FFmpeg encoder availability.
+- Per-destination bitrate/FPS configuration.
+- Stream-key handling remains outside Jeff AI context.
+- Existing camera/screen capture, local recording, Jeff AI and tutorials retained.
+
+Verification:
+- JavaScript syntax check passed.
+- Website reference check passed (20 local references).
+- Full project verification passed.
+
+Important: Actual hardware encoder availability depends on the host GPU/driver and the installed FFmpeg build.

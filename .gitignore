@@ -1,0 +1,13 @@
+# Generated website output
+/dist/
+/node_modules/
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Local logs
+*.log

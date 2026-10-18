@@ -1,0 +1,12 @@
+JT DIGITAL WORLD v33 — INTERACTIVE APP PREVIEWS
+
+The website app previews now load the same renderer.js, AI loading component, and Offers component used by the desktop apps, with a browser-safe preview runtime.
+
+Browser preview behavior:
+- App controls are interactive where the underlying renderer is browser-compatible.
+- Jeff AI uses a local preview response instead of a real provider call.
+- Image generation uses a local preview image instead of a provider call.
+- Offers opens the same Offers UI and monthly/yearly switch; checkout is intentionally a preview alert until a production checkout URL is configured.
+- Electron-only privileged operations are not executed by the public website.
+
+The installed desktop applications retain their Electron IPC and native capabilities.

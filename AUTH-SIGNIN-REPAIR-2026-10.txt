@@ -1,0 +1,7 @@
+JT Digital World sign-in repair update — 2026-10
+
+- Added meaningful auth functional tests: 8/8 passed in local mock-D1 testing.
+- Synced Website HTML/CSS/JS/assets to Website/public, the configured Cloudflare Pages output folder.
+- Added Website/package.json with ESM mode for Node-based auth handler tests.
+- See AUTH-SIGNIN-REPAIR-AND-TESTING.md for test commands and Cloudflare production setup.
+- Not performed: Cloudflare database creation/binding, real browser test, or live production deployment.

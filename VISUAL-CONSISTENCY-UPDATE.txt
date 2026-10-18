@@ -1,0 +1,8 @@
+JT DIGITAL WORLD — VISUAL CONSISTENCY PATCH
+
+Changes in this update:
+- Replaced header logo image dependencies with a visible inline JT monogram badge, so the JT mark renders even when SVG assets or MIME types fail.
+- Unified interior pages around the dark navy, blue/violet glow, fine grid texture, glass cards, gradient headings, and matching navigation/CTA treatment used by the home page.
+- Applied the same shared stylesheet to the public site and root Website copies.
+
+Validation: archive integrity and asset/file presence checked. This was not browser-rendered, deployed, or tested against a live host in this environment.

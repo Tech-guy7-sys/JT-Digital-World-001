@@ -1,0 +1,5 @@
+JT DARK DESIGN UPDATE
+
+Applied one consistent charcoal dark theme across the public website, the root website stylesheet, all desktop app renderer styles, and the website app previews. Removed the bright cyan/purple gradients from primary controls and normalized card surfaces, borders, typography, and input surfaces.
+
+Validation: ZIP integrity and static website HTTP checks were run after packaging. Electron apps require Windows with Node/npm dependencies installed to launch and validate their native runtime; this environment does not provide a Windows desktop runtime, so native app windows were not launched here.

@@ -1,0 +1,10 @@
+JT Digital World update — 61.0.0
+
+- Sign-in page now checks /api/config before attempting authentication.
+- If Cloudflare D1 is not bound as JT_AUTH_DB, it displays an explicit setup explanation and disables forms that cannot succeed.
+- Sign-in/sign-up buttons show a pending disabled state while requests are in flight.
+- Jeff AI shared provider defaults updated to OpenAI gpt-6.1-sol and Gemini gemini-3.8-flash; both are environment-overridable.
+- OpenAI is available to premium/pro/business internal provider pools when a key is configured.
+- Keys remain server-side only.
+
+Not claimed: live Cloudflare configuration or real-account authentication has not been tested because the deployment's D1 binding and secrets are not available in this workspace.

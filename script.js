@@ -1,0 +1,5 @@
+const menuBtn=document.querySelector('.menu-btn');
+const nav=document.querySelector('.nav-links');
+if(menuBtn&&nav){menuBtn.addEventListener('click',()=>{const open=nav.classList.toggle('mobile-open');menuBtn.setAttribute('aria-expanded',String(open));menuBtn.setAttribute('aria-label',open?'Close menu':'Open menu');});}
+try{const targets=document.querySelectorAll('.jt-section-heading,.jt-product-card,.jt-connect-copy,.jt-connect-visual,.jt-cta-panel');if('IntersectionObserver'in window){targets.forEach(el=>el.classList.add('reveal'));const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('is-visible');observer.unobserve(entry.target);}}),{threshold:.08});targets.forEach(el=>observer.observe(el));}else{targets.forEach(el=>el.classList.add('is-visible'));}}catch(_){ }
+if(nav){nav.querySelectorAll('a').forEach(link=>link.addEventListener('click',()=>{nav.classList.remove('mobile-open');if(menuBtn){menuBtn.setAttribute('aria-expanded','false');menuBtn.setAttribute('aria-label','Open menu');}}));}

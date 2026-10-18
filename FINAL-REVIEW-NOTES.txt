@@ -1,0 +1,14 @@
+JT DIGITAL WORLD — FINAL REVIEWED BUILD
+
+Brand: JT Digital World
+Brand mark: JT
+AI assistant: Jeff AI
+
+Visual rules in this build:
+- Homepage keeps the laptop/phone showcase as its signature hero visual.
+- Interior pages use atmospheric neon lighting and glass panels instead of repeating the device hero.
+- Shared focus styles and reduced-motion support are included.
+- Shared stylesheet changes apply to public pages using public/style.css.
+
+Validation performed: ZIP extracted and rebuilt; page titles checked; internal relative HTML/CSS/JS/image references scanned; archive integrity checked after packaging.
+Not performed: browser rendering, live server testing, or deployment.

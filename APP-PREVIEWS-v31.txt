@@ -1,0 +1,6 @@
+JT APP PREVIEWS v31
+
+The Apps dashboard now uses screenshots rendered from the actual app HTML/CSS in installer-payload/apps/*/src.
+Each dashboard tile links to a browser-safe preview page under public/app-previews/.
+The preview pages reuse the actual app markup and stylesheet; runtime Electron IPC is intentionally omitted from browser previews.
+The installed Electron apps retain their real renderer/runtime scripts.

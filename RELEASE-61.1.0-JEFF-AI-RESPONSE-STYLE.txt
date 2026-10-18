@@ -1,0 +1,11 @@
+JT DIGITAL WORLD — RELEASE 61.1.0
+Jeff AI response-style update
+
+- Added a shared response-quality system prompt for all apps using the central JT AI core.
+- Jeff AI now prioritizes direct answers, adaptive length, clean structure, practical examples, clear uncertainty, current-source/tool honesty, and truthful test/deployment status.
+- Added balanced, concise, detailed, tutor, technical, and creative response style profiles.
+- Added language, app context, and optional custom-instruction handling to the prompt builder.
+- Updated the default OpenAI API model to gpt-6-astra and retained Gemini gemini-3.8-flash, based on public provider model documentation checked 2026-10-09. Both can be overridden by environment variables.
+- User-facing identity remains Jeff AI; provider names are not shown in ordinary responses.
+
+Validation: Build/scripts/test-ai-core.js and JavaScript syntax checks run in the packaging environment. No live provider call was made; API keys, billing, account access, and model availability must be verified in the deployment environment.

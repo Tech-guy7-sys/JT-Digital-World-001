@@ -1,0 +1,12 @@
+{
+  "name": "jt-digital-world-website",
+  "private": true,
+  "type": "module",
+  "description": "JT Digital World static website build for Cloudflare Pages",
+  "scripts": {
+    "build:website": "node scripts/build-site.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
