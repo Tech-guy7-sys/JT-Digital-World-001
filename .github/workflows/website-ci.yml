@@ -50,6 +50,10 @@ jobs:
           node --check jt-apps/jt-stream/studio.js
           node --check jt-apps/workspace-tools.js
           node --check jt-apps/pro-workspaces.js
+          grep -q "sessionProjectImport" jt-apps/pro-workspaces.js
+          grep -q "mediaProjectImport" jt-apps/pro-workspaces.js
+          grep -q "Imported session and" jt-apps/pro-workspaces.js
+          grep -q "Imported .*shot record" jt-apps/pro-workspaces.js
           node --check products/site.js
           grep -q "AI coding-agent handoff" jt-apps/pro-workspaces.js
           grep -q "Cloud provider connectors" jt-apps/pro-workspaces.js
