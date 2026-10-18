@@ -1,0 +1,83 @@
+name: JT App Releases
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version, e.g. v1.0.0"
+        required: true
+        type: string
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  package-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Build release bundles
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p release-assets
+          VERSION="${GITHUB_REF_NAME}"
+          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
+            VERSION="${{ inputs.version }}"
+          fi
+          echo "$VERSION" > release-assets/VERSION.txt
+
+          # Always produce a complete repository source archive.
+          git archive --format=zip --prefix="jt-digital-world-${VERSION}/" HEAD > "release-assets/jt-digital-world-${VERSION}-source.zip"
+
+          # Build and package the actual static site using the repository's
+          # maintained build script. This is a web bundle, not a desktop installer.
+          npm run build:website
+          test -f dist/index.html
+          test -f dist/home.html
+          test -f dist/apps.html
+          (cd dist && zip -qr "$GITHUB_WORKSPACE/release-assets/jt-digital-world-${VERSION}-website.zip" .)
+
+          # Package available app preview folders as source/preview bundles.
+          if [[ -d app-previews ]]; then
+            for appdir in app-previews/*/; do
+              [[ -d "$appdir" ]] || continue
+              app="$(basename "$appdir")"
+              (cd "$appdir" && zip -qr "$GITHUB_WORKSPACE/release-assets/jt-${app}-${VERSION}-source-preview.zip" .)
+            done
+          fi
+
+          cat > release-assets/RELEASE-NOTES.md <<EOF
+          # JT Digital World ${VERSION}
+
+          ## Assets
+          - Repository source ZIP: complete tracked repository snapshot.
+          - Website ZIP: built static site from the repository's dist output.
+          - App preview ZIPs: source/preview files from app-previews/ when that directory exists.
+
+          ## Important
+          These archives are source or web-preview bundles, not signed Windows/macOS/Android installers.
+          A true setup package requires a buildable app project, build configuration, dependencies,
+          and platform-specific signing/release settings. No installer is fabricated by this workflow.
+          EOF
+          ls -lah release-assets
+
+      - name: Create GitHub Release and upload archives
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref_name }}
+          name: JT Digital World ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref_name }}
+          generate_release_notes: true
+          files: |
+            release-assets/*.zip
+            release-assets/*.txt
+            release-assets/*.md
